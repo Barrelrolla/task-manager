@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import PlusIcon from "@/icons/icons";
 import TaskBoard from "./components/TaskBoard";
+import { Suspense } from "react";
 
 export default async function HomePage() {
   const user = await getUser();
@@ -34,8 +35,14 @@ export default async function HomePage() {
 
   return (
     <>
-      <form className="mb-8 flex items-end">
-        <InputField label="New task" name="task" id="task" className="pe-10" />
+      <form className="mb-8 flex -translate-x-5.5 items-end justify-center">
+        <InputField
+          labelClasses="text-center"
+          placeholder="New task"
+          name="task"
+          id="task"
+          className="pe-10"
+        />
         <Button
           color="main"
           wrapperClasses="-mx-10 relative z-2 mb-[1px]"
@@ -44,7 +51,9 @@ export default async function HomePage() {
           aria-label="add task"
         />
       </form>
-      <TaskBoard />
+      <Suspense>
+        <TaskBoard />
+      </Suspense>
     </>
   );
 }

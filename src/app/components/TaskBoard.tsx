@@ -1,26 +1,21 @@
-import { getAllTasks } from "@/actions/task";
-import DndContext from "./DndContext";
-import TaskList from "./TaskList";
-import Task from "./Task";
+import { getTasksByStatus } from "@/actions/task";
+import { TaskGroup } from "./TaskGroup";
 
 export default async function TaskBoard() {
-  const tasks = await getAllTasks();
-
+  const tasks = await getTasksByStatus();
   if (!tasks) {
-    return <div>No tasks </div>;
+    return <div>No tasks</div>;
   }
+
+  const { todo, progress, done } = tasks;
 
   return (
     <div className="grid w-full grid-cols-3 text-center">
-      <DndContext>
-        <TaskList title="To Do">
-          {tasks.map((task) => (
-            <Task key={task.id} task={task} />
-          ))}
-        </TaskList>
-        <TaskList title="In Progress"></TaskList>
-        <TaskList title="Completed"></TaskList>
-      </DndContext>
+      <TaskGroup
+        todoTasks={todo!}
+        progressTasks={progress!}
+        doneTasks={done!}
+      />
     </div>
   );
 }

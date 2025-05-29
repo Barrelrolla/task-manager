@@ -1,14 +1,20 @@
 "use client";
 
+import { Task as TaskType } from "@/db/schemas/tasks";
 import { useDroppable } from "@dnd-kit/core";
-import { PropsWithChildren } from "react";
+import Task from "./Task";
 
 export default function TaskList({
   title,
-  children,
-}: { title: string } & PropsWithChildren) {
+  id,
+  tasks,
+}: {
+  title: string;
+  id: string;
+  tasks: TaskType[];
+}) {
   const { isOver, setNodeRef } = useDroppable({
-    id: title,
+    id: id,
   });
   const style = {
     color: isOver ? "green" : undefined,
@@ -17,7 +23,13 @@ export default function TaskList({
   return (
     <div ref={setNodeRef} style={style}>
       <h3>{title}</h3>
-      {children}
+      <ul className="space-y-2">
+        {tasks.map((task) => (
+          <li key={task.id}>
+            <Task task={task} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

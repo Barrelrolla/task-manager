@@ -16,7 +16,7 @@ export default function Task({ task }: { task: TaskType }) {
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <Card containerClasses="hover:cursor-grab active:cursor-grabbing">
+      <Card containerClasses="justify-self-center hover:cursor-grab active:cursor-grabbing">
         <CardTitle>{task.text}</CardTitle>
       </Card>
     </div>

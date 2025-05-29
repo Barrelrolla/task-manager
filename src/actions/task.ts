@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { tasks } from "@/db/schemas/tasks";
 import { getUser } from "@/supabase/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function getAllTasks() {
@@ -15,6 +15,36 @@ export async function getAllTasks() {
   return await db.select().from(tasks).where(eq(tasks.userId, user.id));
 }
 
+export async function getTasksWithStatus(status: string) {
+  const user = await getUser();
+  if (!user) {
+    return;
+  }
+
+  return await db
+    .select()
+    .from(tasks)
+    .where(and(eq(tasks.userId, user.id), eq(tasks.status, status)));
+}
+
+export async function getTasksByStatus() {
+  const user = await getUser();
+  if (!user) {
+    return;
+  }
+  const values = await Promise.all([
+    getTasksWithStatus("todo"),
+    getTasksWithStatus("progress"),
+    getTasksWithStatus("done"),
+  ]);
+
+  return {
+    todo: values[0],
+    progress: values[1],
+    done: values[2],
+  };
+}
+
 export async function createTask(formData: FormData) {
   const user = await getUser();
   const task = formData.get("task") as string;
@@ -23,5 +53,19 @@ export async function createTask(formData: FormData) {
   }
 
   await db.insert(tasks).values({ text: task, userId: user.id });
+  revalidatePath("/");
+}
+
+export async function updateTaskStatus(id: string, newStatus: string) {
+  const user = await getUser();
+  if (!user) {
+    return;
+  }
+
+  await db
+    .update(tasks)
+    .set({ status: newStatus })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)));
+
   revalidatePath("/");
 }

@@ -89,7 +89,7 @@ setTheme();`,
             </NavbarCollapse>
             <NavbarToggle />
           </Navbar>
-          <main className="mx-auto mt-14 max-w-(--max-width) px-4">
+          <main className="mx-auto mt-18 max-w-(--max-width) px-4">
             {children}
           </main>
         </ThemeContextProvider>
