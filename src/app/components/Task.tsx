@@ -12,7 +12,7 @@ export default function Task({ task }: { task: TaskType }) {
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
       }
-    : undefined;
+    : { touchAction: "none" };
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
