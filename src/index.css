@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@plugin "./plugin";
+@source "../node_modules/@barrelrolla/react-components-library/";
+
+:autofill {
+  border-radius: var(--radius-inputs);
+}
+
+:root {
+  --default-font-weight: 200;
+  --radius-inputs: 2rem;
+  --radius-navigation: 0;
+}
