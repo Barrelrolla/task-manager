@@ -24,7 +24,7 @@ export default async function HomePage() {
           <HeroTitle>Task Manager</HeroTitle>
           <HeroText>Login to track your tasks</HeroText>
           <HeroActions>
-            <Button as={Link} href="/login">
+            <Button color="main" variant="outline" as={Link} href="/login">
               Login
             </Button>
           </HeroActions>

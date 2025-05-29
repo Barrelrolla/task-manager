@@ -10,7 +10,7 @@ export default async function TaskBoard() {
   const { todo, progress, done } = tasks;
 
   return (
-    <div className="grid w-full grid-cols-3 text-center">
+    <div className="grid w-full grid-cols-3 gap-2 text-center">
       <TaskGroup
         todoTasks={todo!}
         progressTasks={progress!}

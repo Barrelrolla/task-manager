@@ -1,7 +1,11 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
-import { Card, CardTitle } from "@barrelrolla/react-components-library";
+import {
+  Card,
+  CardInteract,
+  CardText,
+} from "@barrelrolla/react-components-library";
 import { Task as TaskType } from "@/db/schemas/tasks";
 
 export default function Task({ task }: { task: TaskType }) {
@@ -16,8 +20,13 @@ export default function Task({ task }: { task: TaskType }) {
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <Card containerClasses="justify-self-center hover:cursor-grab active:cursor-grabbing">
-        <CardTitle>{task.text}</CardTitle>
+      <Card
+        containerClasses="justify-self-center hover:cursor-grab active:cursor-grabbing"
+        color="main"
+      >
+        <CardInteract>
+          <CardText>{task.text}</CardText>
+        </CardInteract>
       </Card>
     </div>
   );

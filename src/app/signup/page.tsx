@@ -34,7 +34,12 @@ export default function CreateAccountPage() {
           required
         />
         <div className="my-4 flex flex-col">
-          <Button as="button" className="w-full" formAction={signup}>
+          <Button
+            color="main"
+            as="button"
+            className="w-full"
+            formAction={signup}
+          >
             Sign up
           </Button>
         </div>

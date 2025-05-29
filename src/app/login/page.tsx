@@ -28,12 +28,17 @@ export default function LoginPage() {
           required
         />
         <div className="my-4 flex flex-col">
-          <Button as="button" className="w-full" formAction={login}>
+          <Button
+            as="button"
+            color="main"
+            className="w-full"
+            formAction={login}
+          >
             Log in
           </Button>
           <span className="text-center">
             Not registered?{" "}
-            <Anchor className="w-fit" href="/signup">
+            <Anchor color="main" className="w-fit" href="/signup">
               Sign up
             </Anchor>
           </span>
