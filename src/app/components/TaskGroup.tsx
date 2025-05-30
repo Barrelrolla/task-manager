@@ -17,10 +17,8 @@ export function TaskGroup({
     <DndContext
       onDragEnd={(event) => {
         if (event.over) {
-          updateTaskStatus(
-            event.active.id.toString(),
-            event.over.id.toString(),
-          );
+          const overName = event.over.id.toString();
+          updateTaskStatus(event.active.id.toString(), overName);
         }
       }}
     >

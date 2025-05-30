@@ -14,6 +14,7 @@ export default function TaskList({
   tasks: TaskType[];
 }) {
   const { isOver, setNodeRef } = useDroppable({
+    data: { title: title },
     id: id,
   });
   const style = {
