@@ -10,6 +10,7 @@ import {
   createContext,
   PropsWithChildren,
   startTransition,
+  useCallback,
   useContext,
   useEffect,
   useOptimistic,
@@ -33,17 +34,22 @@ export function TasksContextProvider({ children }: PropsWithChildren) {
   const [optimisticTasks, setOptimisticTasks] =
     useOptimistic<TasksByStatus>(tasksState);
 
-  async function refreshTasks() {
-    const tasks = await getTasksByStatus();
-    setTasksState(tasks);
-    startTransition(() => {
-      setOptimisticTasks(tasks);
-    });
-  }
+  const refreshTasks = useCallback(
+    async (setOptimistic: boolean = false) => {
+      const tasks = await getTasksByStatus();
+      setTasksState(tasks);
+      if (setOptimistic) {
+        startTransition(() => {
+          setOptimisticTasks(tasks);
+        });
+      }
+    },
+    [setOptimisticTasks],
+  );
 
   useEffect(() => {
     refreshTasks();
-  }, []);
+  }, [refreshTasks]);
 
   async function addTask(formData: FormData) {
     const text = formData.get("task") as string;
@@ -58,7 +64,7 @@ export function TasksContextProvider({ children }: PropsWithChildren) {
     });
 
     await createTask(formData);
-    refreshTasks();
+    refreshTasks(true);
   }
 
   async function updateTaskStatus(task: Task, newStatus: Status) {
