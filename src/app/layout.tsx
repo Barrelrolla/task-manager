@@ -81,6 +81,7 @@ setTheme();`,
                     underlined={false}
                     as={"button"}
                     onClick={logout}
+                    className="cursor-pointer"
                   >
                     Logout
                   </Anchor>

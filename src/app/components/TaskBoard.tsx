@@ -1,5 +1,6 @@
 "use client";
 
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import DndContext from "./DndContext";
 import TaskList from "./TaskList";
 import { Status } from "@/types";
@@ -17,6 +18,7 @@ export function TaskBoard() {
           updateTaskStatus(event.active.data.current as Task, overName);
         }
       }}
+      modifiers={[restrictToWindowEdges]}
     >
       <TaskList id="todo" title="To Do" />
       <TaskList id="progress" title="In Progress" />
