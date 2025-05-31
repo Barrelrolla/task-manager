@@ -1,3 +1,4 @@
+"use client";
 import { login } from "@/actions/user";
 import {
   Anchor,
@@ -6,12 +7,15 @@ import {
   CardTitle,
   InputField,
 } from "@barrelrolla/react-components-library";
+import { useActionState } from "react";
 
 export default function LoginPage() {
+  const [, loginAction, isPending] = useActionState(login, undefined);
+
   return (
     <Card containerClasses="mx-auto mt-40">
       <CardTitle>Log in</CardTitle>
-      <form className="mx-auto flex w-fit flex-col gap-2">
+      <form action={loginAction} className="mx-auto flex w-fit flex-col gap-2">
         <InputField
           className="w-full"
           type="email"
@@ -19,6 +23,7 @@ export default function LoginPage() {
           name="email"
           label="Email"
           required
+          disabled={isPending}
         />
         <InputField
           type="password"
@@ -26,15 +31,16 @@ export default function LoginPage() {
           name="password"
           label="Password"
           required
+          disabled={isPending}
         />
         <div className="my-4 flex flex-col">
           <Button
             as="button"
             color="main"
             className="w-full"
-            formAction={login}
+            loading={isPending}
           >
-            Log in
+            {isPending ? "Logging in..." : "Log in"}
           </Button>
           <span className="text-center">
             Not registered?{" "}
