@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { tasks } from "@/db/schemas/tasks";
 import { getUser } from "@/supabase/server";
+import { Status, TasksByStatus } from "@/types";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -15,7 +16,7 @@ export async function getAllTasks() {
   return await db.select().from(tasks).where(eq(tasks.userId, user.id));
 }
 
-export async function getTasksWithStatus(status: string) {
+export async function getTasksWithStatus(status: Status) {
   const user = await getUser();
   if (!user) {
     return;
@@ -27,11 +28,16 @@ export async function getTasksWithStatus(status: string) {
     .where(and(eq(tasks.userId, user.id), eq(tasks.status, status)));
 }
 
-export async function getTasksByStatus() {
+export async function getTasksByStatus(): Promise<TasksByStatus> {
   const user = await getUser();
   if (!user) {
-    return;
+    return {
+      todo: [],
+      progress: [],
+      done: [],
+    };
   }
+
   const values = await Promise.all([
     getTasksWithStatus("todo"),
     getTasksWithStatus("progress"),
@@ -39,9 +45,9 @@ export async function getTasksByStatus() {
   ]);
 
   return {
-    todo: values[0],
-    progress: values[1],
-    done: values[2],
+    todo: values[0] || [],
+    progress: values[1] || [],
+    done: values[2] || [],
   };
 }
 
@@ -56,7 +62,7 @@ export async function createTask(formData: FormData) {
   revalidatePath("/");
 }
 
-export async function updateTaskStatus(id: string, newStatus: string) {
+export async function updateTaskStatusAction(id: string, newStatus: Status) {
   const user = await getUser();
   if (!user) {
     return;

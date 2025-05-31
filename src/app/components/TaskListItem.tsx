@@ -7,12 +7,14 @@ import {
   CardText,
   ColorType,
 } from "@barrelrolla/react-components-library";
-import { Task as TaskType } from "@/db/schemas/tasks";
+import { Task } from "@/db/schemas/tasks";
+import { Status } from "@/types";
 
-export default function Task({ task }: { task: TaskType }) {
+export default function TaskLIstItem({ task }: { task: Task }) {
   const { attributes, listeners, setNodeRef, transform, active } = useDraggable(
     {
       id: task.id,
+      data: task,
     },
   );
   const style = transform
@@ -22,14 +24,14 @@ export default function Task({ task }: { task: TaskType }) {
     : { touchAction: "none" };
 
   const classes = "relative" + (active?.id === task.id ? " z-15" : "");
-  const colorMap: { [x: string]: ColorType } = {
+  const colorMap: Record<Status, ColorType> = {
     todo: "info",
-    progress: "warning",
+    progress: "secondary",
     done: "success",
   };
 
   return (
-    <div
+    <li
       className={classes}
       ref={setNodeRef}
       style={style}
@@ -41,9 +43,9 @@ export default function Task({ task }: { task: TaskType }) {
         color={colorMap[task.status]}
       >
         <CardInteract>
-          <CardText>{task.text}</CardText>
+          <CardText className="px-1 py-1 sm:px-2 sm:py-2">{task.text}</CardText>
         </CardInteract>
       </Card>
-    </div>
+    </li>
   );
 }

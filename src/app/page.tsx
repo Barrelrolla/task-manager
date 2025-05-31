@@ -1,4 +1,3 @@
-import { createTask } from "@/actions/task";
 import { getUser } from "@/supabase/server";
 import {
   Button,
@@ -7,12 +6,10 @@ import {
   HeroSection,
   HeroText,
   HeroTitle,
-  InputField,
 } from "@barrelrolla/react-components-library";
 import Link from "next/link";
-import PlusIcon from "@/icons/icons";
-import TaskBoard from "./components/TaskBoard";
-import { Suspense } from "react";
+import Tasks from "./components/Tasks";
+import { TasksContextProvider } from "./components/TasksContext";
 
 export default async function HomePage() {
   const user = await getUser();
@@ -34,26 +31,8 @@ export default async function HomePage() {
   }
 
   return (
-    <>
-      <form className="mb-8 flex -translate-x-5.5 items-end justify-center">
-        <InputField
-          labelClasses="text-center"
-          placeholder="New task"
-          name="task"
-          id="task"
-          className="pe-10"
-        />
-        <Button
-          color="main"
-          wrapperClasses="-mx-10 relative z-2 mb-[1px]"
-          formAction={createTask}
-          startIcon={<PlusIcon />}
-          aria-label="add task"
-        />
-      </form>
-      <Suspense>
-        <TaskBoard />
-      </Suspense>
-    </>
+    <TasksContextProvider>
+      <Tasks />
+    </TasksContextProvider>
   );
 }

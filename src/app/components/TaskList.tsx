@@ -1,35 +1,29 @@
 "use client";
 
-import { Task as TaskType } from "@/db/schemas/tasks";
 import { useDroppable } from "@dnd-kit/core";
-import Task from "./Task";
+import TaskListItem from "./TaskListItem";
+import { Status } from "@/types";
+import { useTasksContext } from "./TasksContext";
 
-export default function TaskList({
-  title,
-  id,
-  tasks,
-}: {
-  title: string;
-  id: string;
-  tasks: TaskType[];
-}) {
+export default function TaskList({ title, id }: { title: string; id: Status }) {
   const { isOver, setNodeRef } = useDroppable({
-    data: { title: title },
     id: id,
   });
-  const style = {
-    color: isOver ? "green" : undefined,
-  };
+  const tasks = useTasksContext().tasks[id];
+
+  const overClasses = isOver ? " text-accent-content bg-accent/20" : "";
 
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+      className={
+        "border-containers rounded-containers min-h-[40vh] p-2" + overClasses
+      }
+      ref={setNodeRef}
+    >
       <h3>{title}</h3>
       <ul className="space-y-2">
-        {tasks.map((task) => (
-          <li key={task.id}>
-            <Task task={task} />
-          </li>
-        ))}
+        {tasks &&
+          tasks.map((task) => <TaskListItem key={task.id} task={task} />)}
       </ul>
     </div>
   );

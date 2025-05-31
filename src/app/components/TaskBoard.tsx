@@ -1,21 +1,26 @@
-import { getTasksByStatus } from "@/actions/task";
-import { TaskGroup } from "./TaskGroup";
+"use client";
 
-export default async function TaskBoard() {
-  const tasks = await getTasksByStatus();
-  if (!tasks) {
-    return <div>No tasks</div>;
-  }
+import DndContext from "./DndContext";
+import TaskList from "./TaskList";
+import { Status } from "@/types";
+import { useTasksContext } from "./TasksContext";
+import { Task } from "@/db/schemas/tasks";
 
-  const { todo, progress, done } = tasks;
+export function TaskBoard() {
+  const { updateTaskStatus } = useTasksContext();
 
   return (
-    <div className="grid w-full grid-cols-3 gap-2 text-center">
-      <TaskGroup
-        todoTasks={todo!}
-        progressTasks={progress!}
-        doneTasks={done!}
-      />
-    </div>
+    <DndContext
+      onDragEnd={(event) => {
+        if (event.over) {
+          const overName = event.over.id.toString() as Status;
+          updateTaskStatus(event.active.data.current as Task, overName);
+        }
+      }}
+    >
+      <TaskList id="todo" title="To Do" />
+      <TaskList id="progress" title="In Progress" />
+      <TaskList id="done" title="Completed" />
+    </DndContext>
   );
 }
