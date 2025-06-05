@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { getSupabaseAuth } from "@/supabase/server";
 
-export async function login(prevState: void, formData: FormData) {
+export async function login(prevState: string | undefined, formData: FormData) {
   const auth = await getSupabaseAuth();
 
   const data = {
@@ -13,17 +13,22 @@ export async function login(prevState: void, formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await auth.signInWithPassword(data);
-
-  if (error) {
-    redirect("/error");
+  try {
+    const { error } = await auth.signInWithPassword(data);
+    if (error) {
+      return error.code?.toString();
+    }
+  } catch (error) {
+    return error as string;
   }
-
   revalidatePath("/", "layout");
   redirect("/");
 }
 
-export async function signup(formData: FormData) {
+export async function signup(
+  prevState: string | undefined,
+  formData: FormData,
+) {
   const auth = await getSupabaseAuth();
 
   const data = {
@@ -31,10 +36,13 @@ export async function signup(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await auth.signUp(data);
-
-  if (error) {
-    redirect("/error");
+  try {
+    const { error } = await auth.signInWithPassword(data);
+    if (error) {
+      return error.code?.toString();
+    }
+  } catch (error) {
+    return error as string;
   }
 
   revalidatePath("/", "layout");
