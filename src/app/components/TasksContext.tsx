@@ -1,6 +1,7 @@
 "use client";
 import {
   createTask,
+  deleteTaskAction,
   getTasksByStatus,
   updateTaskStatusAction,
 } from "@/actions/task";
@@ -21,6 +22,7 @@ export type TasksContextProps = {
   tasks: TasksByStatus;
   updateTaskStatus: (task: Task, newStatus: Status) => void;
   addTask: (formData: FormData) => void;
+  deleteTask: (id: string) => void;
 };
 
 const TasksContext = createContext<TasksContextProps | undefined>(undefined);
@@ -93,9 +95,24 @@ export function TasksContextProvider({ children }: PropsWithChildren) {
     refreshTasks();
   }
 
+  async function deleteTask(id: string) {
+    startTransition(() => {
+      setOptimisticTasks((prevTasks) => {
+        return {
+          todo: prevTasks.todo.filter((task) => task.id !== id),
+          progress: prevTasks.progress.filter((task) => task.id !== id),
+          done: prevTasks.done.filter((task) => task.id !== id),
+        };
+      });
+    });
+
+    await deleteTaskAction(id);
+    refreshTasks();
+  }
+
   return (
     <TasksContext.Provider
-      value={{ tasks: optimisticTasks, updateTaskStatus, addTask }}
+      value={{ tasks: optimisticTasks, updateTaskStatus, addTask, deleteTask }}
     >
       {children}
     </TasksContext.Provider>

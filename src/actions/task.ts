@@ -75,3 +75,16 @@ export async function updateTaskStatusAction(id: string, newStatus: Status) {
 
   revalidatePath("/");
 }
+
+export async function deleteTaskAction(id: string) {
+  const user = await getUser();
+  if (!user) {
+    return;
+  }
+
+  await db
+    .delete(tasks)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)));
+
+  revalidatePath("/");
+}

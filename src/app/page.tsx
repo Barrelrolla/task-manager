@@ -8,8 +8,8 @@ import {
   HeroTitle,
 } from "@barrelrolla/react-components-library";
 import Link from "next/link";
-import Tasks from "./components/Tasks";
 import { TasksContextProvider } from "./components/TasksContext";
+import { TaskBoard } from "./components/TaskBoard";
 
 export default async function HomePage() {
   const user = await getUser();
@@ -32,7 +32,7 @@ export default async function HomePage() {
 
   return (
     <TasksContextProvider>
-      <Tasks />
+      <TaskBoard />
     </TasksContextProvider>
   );
 }
