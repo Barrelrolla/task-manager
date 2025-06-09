@@ -40,30 +40,35 @@ export function TasksContextProvider({
   const [optimisticTasks, setOptimisticTasks] =
     useOptimistic<TasksByStatus>(tasksState);
 
-  const refreshTasks = useCallback(
-    async (setOptimistic: boolean = false) => {
-      let tasks: TasksByStatus;
+  const refreshTasks = useCallback(async () => {
+    let tasks: TasksByStatus;
 
-      function timeout() {
-        return new Promise((resolve) => setTimeout(resolve, 0));
-      }
+    function timeout() {
+      return new Promise((resolve) => setTimeout(resolve, 0));
+    }
 
-      if (!user) {
-        await timeout();
+    if (!user) {
+      await timeout();
+      if (localStorage.getItem("tasks")) {
         tasks = JSON.parse(localStorage.getItem("tasks") || "");
       } else {
-        tasks = await getTasksByStatus();
+        const emptyTasks: TasksByStatus = {
+          todo: [],
+          progress: [],
+          done: [],
+        };
+        tasks = emptyTasks;
+        localStorage.setItem("tasks", JSON.stringify(emptyTasks));
       }
+    } else {
+      tasks = await getTasksByStatus();
+    }
 
-      setTasksState(tasks);
-      if (setOptimistic) {
-        startTransition(() => {
-          setOptimisticTasks(tasks);
-        });
-      }
-    },
-    [user, setOptimisticTasks],
-  );
+    setTasksState(tasks);
+    startTransition(() => {
+      setOptimisticTasks(tasks);
+    });
+  }, [user, setOptimisticTasks]);
 
   useEffect(() => {
     refreshTasks();
@@ -97,7 +102,7 @@ export function TasksContextProvider({
       await createTask(formData);
     }
 
-    refreshTasks(true);
+    refreshTasks();
   }
 
   async function updateTaskStatus(task: Task, newStatus: Status) {
