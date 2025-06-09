@@ -46,9 +46,10 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname !== "/"
   ) {
     // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    // const url = request.nextUrl.clone();
+    // url.pathname = "/login";
+    // return NextResponse.redirect(url);
+    // not redirecting any more to allow localStorage use.
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

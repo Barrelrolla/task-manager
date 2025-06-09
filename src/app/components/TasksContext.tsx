@@ -7,6 +7,7 @@ import {
 } from "@/actions/task";
 import { Task } from "@/db/schemas/tasks";
 import { Status, TasksByStatus } from "@/types";
+import { User } from "@supabase/supabase-js";
 import {
   createContext,
   PropsWithChildren,
@@ -27,7 +28,10 @@ export type TasksContextProps = {
 
 const TasksContext = createContext<TasksContextProps | undefined>(undefined);
 
-export function TasksContextProvider({ children }: PropsWithChildren) {
+export function TasksContextProvider({
+  user,
+  children,
+}: { user: User | null } & PropsWithChildren) {
   const [tasksState, setTasksState] = useState<TasksByStatus>({
     todo: [],
     progress: [],
@@ -38,7 +42,19 @@ export function TasksContextProvider({ children }: PropsWithChildren) {
 
   const refreshTasks = useCallback(
     async (setOptimistic: boolean = false) => {
-      const tasks = await getTasksByStatus();
+      let tasks: TasksByStatus;
+
+      function timeout() {
+        return new Promise((resolve) => setTimeout(resolve, 0));
+      }
+
+      if (!user) {
+        await timeout();
+        tasks = JSON.parse(localStorage.getItem("tasks") || "");
+      } else {
+        tasks = await getTasksByStatus();
+      }
+
       setTasksState(tasks);
       if (setOptimistic) {
         startTransition(() => {
@@ -46,7 +62,7 @@ export function TasksContextProvider({ children }: PropsWithChildren) {
         });
       }
     },
-    [setOptimisticTasks],
+    [user, setOptimisticTasks],
   );
 
   useEffect(() => {
@@ -55,17 +71,32 @@ export function TasksContextProvider({ children }: PropsWithChildren) {
 
   async function addTask(formData: FormData) {
     const text = formData.get("task") as string;
+    const taskToAdd: Task = {
+      id: text,
+      status: "todo",
+      text: text,
+      userId: "",
+    };
+
     startTransition(() => {
-      setOptimisticTasks((prevTasks) => ({
-        ...prevTasks,
-        todo: [
-          ...prevTasks.todo,
-          { id: text, status: "todo", text: text, userId: "" },
-        ],
-      }));
+      setOptimisticTasks((prevTasks) => {
+        const newTasks = {
+          ...prevTasks,
+          todo: [...prevTasks.todo, taskToAdd],
+        };
+
+        if (!user) {
+          localStorage.setItem("tasks", JSON.stringify(newTasks));
+        }
+
+        return newTasks;
+      });
     });
 
-    await createTask(formData);
+    if (user) {
+      await createTask(formData);
+    }
+
     refreshTasks(true);
   }
 
@@ -88,25 +119,41 @@ export function TasksContextProvider({ children }: PropsWithChildren) {
             status: newStatus,
           },
         ];
+
+        if (!user) {
+          localStorage.setItem("tasks", JSON.stringify(newTasks));
+        }
+
         return newTasks;
       });
     });
-    await updateTaskStatusAction(task.id, newStatus);
+
+    if (user) {
+      await updateTaskStatusAction(task.id, newStatus);
+    }
     refreshTasks();
   }
 
   async function deleteTask(id: string) {
     startTransition(() => {
       setOptimisticTasks((prevTasks) => {
-        return {
+        const newTasks = {
           todo: prevTasks.todo.filter((task) => task.id !== id),
           progress: prevTasks.progress.filter((task) => task.id !== id),
           done: prevTasks.done.filter((task) => task.id !== id),
         };
+
+        if (!user) {
+          localStorage.setItem("tasks", JSON.stringify(newTasks));
+        }
+
+        return newTasks;
       });
     });
 
-    await deleteTaskAction(id);
+    if (user) {
+      await deleteTaskAction(id);
+    }
     refreshTasks();
   }
 
